@@ -27,7 +27,7 @@ import java.util.List;
 import model.Tour;
 import utils.UIHelper;
 
-
+// This is a test of changes in VCS
 public class MainActivity extends ActionBarActivity {
 
     public static final String LOGTAG = "LD";
