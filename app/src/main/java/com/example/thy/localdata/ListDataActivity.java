@@ -22,11 +22,13 @@ public class ListDataActivity extends ListActivity {
     private static final String LOGTAG = "LD";
     public static final String USERNAME = "pref_username";
     public static final String  VIEWIMAGE = "example_checkbox";
+    private static final int TOUR_DETAIL_ACTIVITY = 1001;
 //    SQLiteOpenHelper dbhelper;
 //    SQLiteDatabase database;
     ToursDataSource dataSource;
     SharedPreferences settings;
     List<Tour> tours;
+    Boolean isMyTours;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,10 +42,18 @@ public class ListDataActivity extends ListActivity {
 //        database = dbhelper.getWritableDatabase();
         dataSource = new ToursDataSource(this);
         dataSource.open();
-        tours = dataSource.findAll();
-        if (tours.size()==0) {
-            createData();
+
+        Intent intent = getIntent();
+        isMyTours = intent.getBooleanExtra("ShowMyTours", true);
+        if (isMyTours){
+            tours = dataSource.findMyTours();
+        } else {
+
             tours = dataSource.findAll();
+            if (tours.size() == 0) {
+                createData();
+                tours = dataSource.findAll();
+            }
         }
         refreshDisplay();
     }
@@ -142,8 +152,20 @@ public class ListDataActivity extends ListActivity {
         Tour tour = tours.get(position);
         Intent intent = new Intent(this, TourDetailActivity.class);
         intent.putExtra(".model.Tour", tour);
-        startActivity(intent);
+        intent.putExtra("isMyTours", isMyTours);
+        //startActivity(intent);
+        startActivityForResult(intent, TOUR_DETAIL_ACTIVITY);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == TOUR_DETAIL_ACTIVITY && isMyTours && resultCode==-1){
+            dataSource.open();
+            tours = dataSource.findMyTours();
+            refreshDisplay();
+        }
     }
 }
 

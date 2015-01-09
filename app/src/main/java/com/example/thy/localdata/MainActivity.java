@@ -27,7 +27,7 @@ import java.util.List;
 import model.Tour;
 import utils.UIHelper;
 
-// This is a test of changes in VCS
+// This is a test of changes in VCS what
 public class MainActivity extends ActionBarActivity {
 
     public static final String LOGTAG = "LD";
@@ -268,6 +268,13 @@ public class MainActivity extends ActionBarActivity {
 
     public void showListData(View v){
         Intent intent = new Intent(this, ListDataActivity.class);
+        intent.putExtra("ShowMyTours", false);
+        startActivity(intent);
+    }
+
+    public void showListMyTours(View v){
+        Intent intent = new Intent(this, ListDataActivity.class);
+        intent.putExtra("ShowMyTours", true);
         startActivity(intent);
     }
 }
