@@ -54,12 +54,18 @@ public class ToursDataSource {
     }
 
     public List<Tour> findAll(){
-        List<Tour> tours = new ArrayList<Tour>();
+        //List<Tour> tours = new ArrayList<Tour>();
 
         Cursor cursor = database.query(ToursDBOpenHelper.TABLE_TOURS, allColumns,
                 null,null,null,null,null);
         Log.i(LOGTAG,"Returned " + cursor.getCount() + "row(s).");
 
+
+        return cursorToList(cursor);
+    }
+
+    private List<Tour> cursorToList(Cursor cursor) {
+        List<Tour> tours = new ArrayList<Tour>();
         if (cursor.getCount() > 0){
             while (cursor.moveToNext()){
                 Tour tour = new Tour();
@@ -74,4 +80,31 @@ public class ToursDataSource {
         }
         return tours;
     }
+
+    public boolean addToMyTours(Tour tour) {
+        ContentValues values = new ContentValues();
+        values.put(ToursDBOpenHelper.COLUMN_ID, tour.getId());
+        long result = database.insert(ToursDBOpenHelper.TABLE_MYTOURS, null, values);
+        return (result != -1);
+    }
+
+    public boolean deleteMyTours(Tour tour){
+        String strWhere = ToursDBOpenHelper.COLUMN_ID + "=" + tour.getId();
+        int result = database.delete(ToursDBOpenHelper.TABLE_MYTOURS, strWhere, null);
+        return result != 0;
+    }
+
+    public List<Tour> findMyTours() {
+
+        String query = "SELECT tours.* FROM " +
+                "tours JOIN mytours ON " +
+                "tours.tourId = mytours.tourId";
+        Cursor cursor = database.rawQuery(query, null);
+
+        Log.i(LOGTAG, "Returned " + cursor.getCount() + " rows");
+
+        List<Tour> tours = cursorToList(cursor);
+        return tours;
+    }
+
 }
